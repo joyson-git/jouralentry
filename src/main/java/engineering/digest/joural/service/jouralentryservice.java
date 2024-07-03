@@ -4,12 +4,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
+
 import org.springframework.stereotype.Component;
 
 import engineering.digest.joural.entity.JouralEntry;
 import engineering.digest.joural.repositary.jouralentryrepositary;
+
 
 @Component
 public class jouralentryservice{
@@ -20,15 +22,13 @@ public class jouralentryservice{
 	@Autowired
 	private Userservice userservice;
 	
-	  public void save(JouralEntry journalEntry) {
-	        User user = userservice.findByUserName(userName);
-	        if (user != null) {
-	            journalEntry.setUser(userName);
-	            jouralRepository.save(journalEntry);
-	        } else {
-	            throw new RuntimeException("User not found");
+	  public void save(JouralEntry journalEntry, String userName) {
+			  User user = userservice.findByUserName(userName);
+	            journalEntry.setDate(LocalDateTime.now());
+	              JouralEntry  saved =jouralRepository.save(journalEntry);
+	       
 	        }
-	    }
+	   
 public List<JouralEntry> getAll(){
 	 return jouralRepository.findAll();
 }

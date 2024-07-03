@@ -27,11 +27,13 @@ public class Userservice {
         return userrespositary.findById(id);
     }
 
+    public User findByUserName(String userName) {
+        return userrespositary.findByUserName(userName);
+    }
+    
     public void deleteById(String id) {
         userrespositary.deleteById(id);
     }
 
-    public User findByUserName(String userName) {
-        return userrespositary.findByUserName(userName);
-    }
+   
 }

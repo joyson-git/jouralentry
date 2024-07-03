@@ -1,5 +1,7 @@
 package engineering.digest.joural.entity;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -17,6 +19,15 @@ public class JouralEntry {
     private String title;
     @NonNull
     private String content;
+    
+    private LocalDateTime date;
+    
+	public LocalDateTime getDate() {
+		return date;
+	}
+	public void setDate(LocalDateTime date) {
+		this.date = date;
+	}
 	public String getId() {
 		return id;
 	}

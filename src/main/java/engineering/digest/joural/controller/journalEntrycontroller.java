@@ -27,23 +27,20 @@ public class journalEntrycontroller {
     @GetMapping("/{userName}")
     public ResponseEntity<?> getAllJournalEntriesOfUser(@PathVariable String userName) {
         User user = userService.findByUserName(userName);
-        if (user != null) {
-            List<JouralEntry> allEntries = user.getJouralEntries();
-            if (allEntries != null && !allEntries.isEmpty()) {
-                return ResponseEntity.ok(allEntries);
-            } else {
-                return ResponseEntity.status(404).body("No journal entries found for user " + userName);
-            }
-        } else {
-            return ResponseEntity.status(404).body("User not found");
+            List<JouralEntry> all = user.getJouralEntries();
+            if (all != null && !all.isEmpty()) {
+                return  new ResponseEntity<>(all,HttpStatus.OK);
+            } 
+            return  new ResponseEntity<>(all,HttpStatus.NOT_FOUND);
         }
-    }
+    
 
-    @PostMapping
+    @PostMapping("{userName}")
     public ResponseEntity<?> createEntry(@RequestBody JouralEntry myEntry,@PathVariable String userName) {
         
     	try {
-    		journalEntryService.save(myEntry);
+    		 
+    		journalEntryService.save(myEntry,userName);
             return ResponseEntity.ok("Journal entry created successfully");
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

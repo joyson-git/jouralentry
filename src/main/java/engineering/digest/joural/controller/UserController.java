@@ -3,9 +3,9 @@ package engineering.digest.joural.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,16 +34,15 @@ public class UserController {
     }
 
     @PutMapping("/{userName}")
-    public ResponseEntity<?> updateUser(@RequestBody User user,@PathVariable String  userName) {
-        User userInDb = userservice.findByUserName(userName);
+    public ResponseEntity<?> updateUser(@RequestBody User user) {
+        User userInDb = userservice.findByUserName(user.getUserName());
 
         if (userInDb != null) {
             userInDb.setUserName(user.getUserName());
             userInDb.setPasswords(user.getPasswords());
             userservice.save(userInDb);
-            return ResponseEntity.ok("User updated successfully");
-        } else {
-            return ResponseEntity.status(404).body("User not found");
         }
+            return  new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } 
     }
-}
+
