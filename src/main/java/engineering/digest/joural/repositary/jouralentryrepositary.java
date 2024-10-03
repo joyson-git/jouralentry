@@ -1,10 +1,13 @@
 package engineering.digest.joural.repositary;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
-
-import engineering.digest.joural.entity.JouralEntry;
 
 
-public  interface jouralentryrepositary extends MongoRepository<JouralEntry, String>{
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import engineering.digest.joural.entity.JournalEntry;
+
+@Repository
+public  interface jouralentryrepositary extends  JpaRepository<JournalEntry, Long> {
 	
 }

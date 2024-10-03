@@ -1,75 +1,72 @@
 package engineering.digest.joural.controller;
 
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import engineering.digest.joural.entity.JouralEntry;
+import engineering.digest.joural.entity.JournalEntry;
 import engineering.digest.joural.entity.User;
+import engineering.digest.joural.service.JournalEntryService;
 import engineering.digest.joural.service.Userservice;
-import engineering.digest.joural.service.jouralentryservice;
-
 
 @RestController
 @RequestMapping("/journal")
-public class journalEntrycontroller {
+public class JournalEntryController {
 
     @Autowired
-    private jouralentryservice journalEntryService;
+    private JournalEntryService journalEntryService;
 
     @Autowired
     private Userservice userService;
 
     @GetMapping("/{userName}")
-    public ResponseEntity<?> getAllJournalEntriesOfUser(@PathVariable String userName) {
+    public ResponseEntity<List<JournalEntry>> getAllJournalEntriesOfUser(@PathVariable String userName) {
         User user = userService.findByUserName(userName);
-            List<JouralEntry> all = user.getJouralEntries();
-            if (all != null && !all.isEmpty()) {
-                return  new ResponseEntity<>(all,HttpStatus.OK);
-            } 
-            return  new ResponseEntity<>(all,HttpStatus.NOT_FOUND);
+        if (user != null) {
+            List<JournalEntry> allEntries = user.getJournalEntries();
+            if (allEntries != null && !allEntries.isEmpty()) {
+                return new ResponseEntity<>(allEntries, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-    
-
-    @PostMapping("{userName}")
-    public ResponseEntity<?> createEntry(@RequestBody JouralEntry myEntry,@PathVariable String userName) {
-        
-    	try {
-    		 
-    		journalEntryService.save(myEntry,userName);
-            return ResponseEntity.ok("Journal entry created successfully");
-		} catch (Exception e) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping("/id/{myid}")
-    public ResponseEntity<?> getJournalEntryById(@PathVariable String myid) {
-    	JouralEntry entry = journalEntryService.findById(myid).orElse(null);
-        if (entry != null) {
-            return ResponseEntity.ok(entry);
-        } else {
-            return ResponseEntity.status(404).body("Journal entry not found");
+    @PostMapping("/{userName}")
+    public ResponseEntity<JournalEntry> createEntry(@RequestBody JournalEntry myEntry, @PathVariable String userName) {
+        try {
+            JournalEntry savedEntry = journalEntryService.save(myEntry, userName);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedEntry);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
+    }
+
+    @GetMapping("/id/{id}")
+    public ResponseEntity<JournalEntry> getJournalEntryById(@PathVariable Long id) {
+        return journalEntryService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteJournalEntryById(@PathVariable String id) {
-        journalEntryService.deleteById(id);
-        return ResponseEntity.ok("Journal entry deleted successfully");
+    public ResponseEntity<String> deleteJournalEntryById(@PathVariable Long id) {
+        try {
+            journalEntryService.deleteById(id);
+            return ResponseEntity.ok("Journal entry deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error deleting journal entry: " + e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateJournalEntryById(@PathVariable String id, @RequestBody JouralEntry updatedEntry) {
-    	JouralEntry entry = journalEntryService.updateEntry(id, updatedEntry);
-        if (entry != null) {
-            return ResponseEntity.ok(entry);
-        } else {
-            return ResponseEntity.status(404).body("Journal entry not found");
-        }
+    public ResponseEntity<JournalEntry> updateJournalEntryById(@PathVariable Long id, @RequestBody JournalEntry updatedEntry) {
+        return journalEntryService.updateEntry(id, updatedEntry)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 }

@@ -1,67 +1,80 @@
 package engineering.digest.joural.entity;
 
+
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
-import com.mongodb.lang.NonNull;
-
-
-
-import lombok.Data;
-
-@Data
-@Document(collection = "users")
+@Entity
+@Table(name = "users")
 public class User {
+
     @Id
-    private String id;
-    
-    @Indexed(unique = true)
-    @NonNull
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "user_name", nullable = false, unique = true)
     private String userName;
+
+    @Column(name = "password", nullable = false)
+    private String password;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<JournalEntry> journalEntries = new ArrayList<>(); // Initialize with an empty list
+
+    // Getters and Setters
     
-    @NonNull
-    private String passwords;
- 
-    @DBRef
-    private List<JouralEntry> jouralEntries = new ArrayList<>();
+    @ElementCollection
+    @Column(name = "roles")
+    private List<String> roles = new ArrayList<>();  
 
+    public Long getId() {
+        return id;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public String getUserName() {
+        return userName;
+    }
 
-	public String getUserName() {
-		return userName;
-	}
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public String getPasswords() {
-		return passwords;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	public void setPasswords(String passwords) {
-		this.passwords = passwords;
-	}
+    public List<JournalEntry> getJournalEntries() {
+        return journalEntries;
+    }
 
-	public List<JouralEntry> getJouralEntries() {
-		return jouralEntries;
-	}
-
-	public void setJouralEntries(List<JouralEntry> jouralEntries) {
-		this.jouralEntries = jouralEntries;
-	}
+    public void setJournalEntries(List<JournalEntry> journalEntries) {
+        this.journalEntries = journalEntries;
+    }
     
-    
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
+    }
 }
